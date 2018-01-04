@@ -146,9 +146,13 @@ void FEGrid::precomputeIntegrals() {
 	int size = m_elements.size(); 
 
 #ifdef OPENMP
-	cout << "precomputing integrals in parallel" << endl; 
 	#pragma omp parallel
 	{
+		#pragma omp master
+		{
+				cout << "precomputing integrals in parallel with " << 
+					omp_get_num_threads() << " threads" << endl; 
+		}
 
 		// had to manually schedule for some reason 
 		int threadnum = omp_get_thread_num(); 
