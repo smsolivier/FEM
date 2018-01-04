@@ -31,7 +31,7 @@ CFLAGS = -std=c++14 -I$(FE) -I$(OPERATORS) \
 	-I$(SOLVERS) -I$(TIMER) -I$(VISIT) \
 	-I$(EIGEN) -I$(MATERIALS) -I$(FIELD)
 ifdef SUPERLU
-CFLAGS += -DSUPERLU
+CFLAGS += -DSUPERLU 
 endif
 ifdef OPENMP
 CFLAGS += -DOPENMP -fopenmp 

@@ -38,10 +38,14 @@ FEGrid::FEGrid(const string& a_mshFile) {
 			m_nodes[ID] = Node(position, -2, m_nTotalNodes, false); 
 			// m_nInteriorNodes++; 
 		} 
+		// outflow BC
+		else if (boundary == 3) {
+			m_nodes[ID] = Node(position, m_nInteriorNodes, m_nTotalNodes, true); 
+			m_nInteriorNodes++; 
+		}
 		// not defined 
 		else {
-			// m_nodes[ID] = Node(position, -1, m_nTotalNodes, false); 
-			cout << "ERROR (FEGrid.cpp): boundary not defined" << endl; 
+			cout << "ERROR (FEGrid.cpp): boundary " << boundary << " not defined" << endl; 
 			exit(0); 
 		}
 		m_nTotalNodes++; 
@@ -200,7 +204,6 @@ void FEGrid::writeFields(vector<double>& a_sol, const char* a_filename) {
 	vector<double> v = m_fields.extract(a_sol, "v"); 
 	vector<double> p = m_fields.extract(a_sol, "p"); 
 
-
 	// insert zeros 
 	vector<float> u_tmp(m_nTotalNodes), v_tmp(m_nTotalNodes), p_tmp(m_nTotalNodes); 
 	for (int i=0; i<m_nTotalNodes; i++) {
@@ -228,7 +231,6 @@ void FEGrid::writeFields(vector<double>& a_sol, const char* a_filename) {
 		vec.push_back(v_tmp[i]); 
 		vec.push_back(0); 
 	}
-
 
 	vector<float> pts(3*u_tmp.size()); 
 	for (int i=0; i<u_tmp.size(); i++) {

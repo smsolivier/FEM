@@ -22,15 +22,18 @@ public:
 		const bool a_isInterior); 
 
 	/// returns the x, y position of the node 
-	vector<double> getPosition() {return m_position; };  
+	inline vector<double> getPosition() {return m_position; };  
 	/// returns the nodes interior ID
-	int getInteriorNodeID() {return m_intID; }; 
+	inline int getInteriorNodeID() {return m_intID; }; 
 	/// same as getInteriorNodeID
-	int interiorNodeID() {return m_intID; }; 
+	inline int interiorNodeID() {return m_intID; }; 
 	/// returns the node's global ID 
-	int getNodeID() {return m_gID; };
+	inline int getNodeID() {return m_gID; };
 	/// returns true if the node is on the interior  
-	bool isInterior() {return m_interior; }; 
+	inline bool isInterior() {return m_interior; }; 
+
+	/// print the x,y,z position of the node to screen 
+	void printPosition() const; 
 	
 private:
 	/// store x, y, z position 

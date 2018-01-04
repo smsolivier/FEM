@@ -40,10 +40,11 @@ int Fields::size() {return m_nUnknowns; }
 vector<double> Fields::extract(vector<double>& a_vals, string a_name) {
 	assert(a_vals.size() == m_nUnknowns); 
 
-	vector<double> ret; 
-	for (int i=0; i<m_points.size(); i++) {
+	int nPoints = m_points.size(); 
+	vector<double> ret(nPoints); 
+	for (int i=0; i<nPoints; i++) {
 		if (m_points[i].inPoint(a_name)) {
-			ret.push_back(a_vals[m_points[i][a_name]]); 
+			ret[i] = a_vals[m_points[i][a_name]]; 
 		}
 	}
 

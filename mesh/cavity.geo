@@ -1,12 +1,13 @@
 L = .5;
-res = .05; 
-Point(1) = {0, 0, 0, 1.0};
+res = .005; 
+res2 = .05; 
+Point(1) = {0, 0, 0, res};
 //+
-Point(2) = {L, 0, 0, 1.0};
+Point(2) = {L, 0, 0, res};
 //+
-Point(3) = {L, L, 0, res};
+Point(3) = {L, L, 0, res/5};
 //+
-Point(4) = {0, L, 0, res};
+Point(4) = {0, L, 0, res/5};
 //+
 Line(1) = {4, 3};
 //+
@@ -25,3 +26,5 @@ Physical Line(1) = {4, 3, 2};
 Physical Line(2) = {1};
 //+
 Physical Surface(5) = {1};
+Point(5) = {L/2, L/2, 0, res2}; 
+Point{5} In Surface{1}; 

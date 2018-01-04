@@ -8,9 +8,15 @@
 
 using namespace std; 
 
-int main() {
+int main(int argc, char* argv[]) {
 
-	FEGrid grid("../mesh/cavity"); 
+	if (argc < 2) {
+		cout << "give mesh name" << endl; 
+		exit(0); 
+	}
+
+	string prefix(argv[1]); 
+	FEGrid grid("../mesh/"+prefix); 
 	grid.meshInfo(); 
 	grid.precomputeIntegrals(); 
 	NSOp ns(grid); 
@@ -26,6 +32,30 @@ int main() {
 		cout << "Diagonal < 0" << endl; 
 	}
 
+	vector<double> sol; 
+	ns.makeRHS(sol); 
+
+	// find a node
+	// Node node; 
+	// for (int i=0; i<grid.getNumNodes(); i++) {
+	// 	node = grid.node(i); 
+	// 	if (node.isInterior()) {
+	// 		node.printPosition(); 
+	// 		break; 
+	// 	}
+	// }
+
+	// int id = node.interiorNodeID(); 
+
+	// Fields& fields = grid.getFields(); 
+	// int pid = fields[id]["p"]; 
+	// sol[pid] = 0; 
+	// for (int i=0; i<A.getM(); i++) {
+	// 	if (i == pid) A(pid, pid) = 1; 
+	// 	else {
+	// 		if (A.at(pid, i) != 0) A(pid, i) = 0; 
+	// 	}
+	// }
 	// setup solvers 
 	// CG linsol(A, 1e-6, 1000); 
 	// linsol.printStats(); 
@@ -35,9 +65,6 @@ int main() {
 
 	// LU linsol(A); 
 	Cholesky linsol(A); 
-
-	vector<double> sol; 
-	ns.makeRHS(sol); 
 
 	linsol.solve(sol); 
 
