@@ -25,6 +25,8 @@ public:
 	vector<double> getPosition() {return m_position; };  
 	/// returns the nodes interior ID
 	int getInteriorNodeID() {return m_intID; }; 
+	/// same as getInteriorNodeID
+	int interiorNodeID() {return m_intID; }; 
 	/// returns the node's global ID 
 	int getNodeID() {return m_gID; };
 	/// returns true if the node is on the interior  

@@ -205,8 +205,31 @@ const Eigen::SparseMatrix<double> SparseMatrix::getEigenMatrix() const {
 
 }
 
+void SparseMatrix::convertToTriplet(vector<double>& a_vals, 
+	vector<int>& a_rows, vector<int>& a_cols) const {
+
+	CH_TIMERS("SpMat: convert to triplet"); 
+
+	// make sure vectors are correct size 
+	a_vals.resize(m_nnz); 
+	a_rows.resize(m_nnz); 
+	a_cols.resize(m_nnz); 
+
+	int index = 0; 
+	for (int i=0; i<m_m; i++) {
+		for (int j=0; j<m_rowIndex[i].size(); j++) {
+			a_vals[index] = m_data[i][j]; 
+			a_rows[index] = m_rowIndex[i][j]; 
+			a_cols[index] = i; 
+			index++; 
+		}
+	}
+
+}
+
 int SparseMatrix::getM() const { return m_m; }
 int SparseMatrix::getN() const { return m_n; } 
+int SparseMatrix::getNNZ() const {return m_nnz; }
 
 SparseMatrix SparseMatrix::transpose() const {
 
@@ -343,6 +366,7 @@ void SparseMatrix::sparsity() const {
 
 	}
 
+	cout << "number of unknowns = " << m_n << endl; 
 	cout << "number of non zeros = " << nnz << endl; 
 	cout << "sparsity factor = " << (double)nnz/(m_n*m_m) << endl; 
 

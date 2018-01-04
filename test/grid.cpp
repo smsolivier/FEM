@@ -6,6 +6,6 @@ int main() {
 	grid.meshInfo(); 
 
 	Fields& f = grid.getFields(); 
-	f.printUnknownOrdering(); 
+	// f.printUnknownOrdering(); 
 	// f.printFieldsPerPoint(); 
 }

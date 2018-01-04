@@ -58,11 +58,16 @@ public:
 	const vector<vector<double>> getDenseMatrix() const; 
 	/// convert to Eigen matrix format 
 	const Eigen::SparseMatrix<double> getEigenMatrix() const; 
+	/// convert to triplet format 
+	void convertToTriplet(vector<double>& a_vals, 
+		vector<int>& a_rows, vector<int>& a_cols) const; 
 
 	/// return number of rows 
 	int getM() const; 
 	/// returns number of columns 
 	int getN() const;
+	/// return number of nonzeros 
+	int getNNZ() const; 
 
 	/// returns a SparseMatrix that is the transpose of *this
 	SparseMatrix transpose() const;
@@ -72,11 +77,16 @@ public:
 	bool positiveDiagonal() const; 
 
 private:
-	int m_m, m_n; // store number of rows, cols 
-	int m_nnz; // store number of nonzeros 
-	double m_zero; // store a zero to be returned as reference 
-	vector<vector<double>> m_data; /// stores the non-zero data 
-	vector<vector<int>> m_rowIndex; /// stores where the nonzeros go in the matrix 
+	/// store number of rows, cols 
+	int m_m, m_n;
+	/// store number of nonzeros
+	int m_nnz;  
+	/// store a zero to be returned as reference 
+	double m_zero; 
+	/// stores the non-zero data 
+	vector<vector<double>> m_data; 
+	/// stores where the nonzeros go in the matrix 
+	vector<vector<int>> m_rowIndex; 
 };
 
 #endif 

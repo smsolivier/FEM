@@ -14,8 +14,18 @@ public:
 	/** a_p: integrate up to a_p order polynomials exactly */ 
 	GQ(int a_p); 
 	/// integrate the lambda function f 
-	double integrate(auto& f) {
-		CH_TIMERS("GQ integrate"); 
+	inline double operator()(auto& f) {
+		// CH_TIMERS("GQ integrate"); 
+		double val = 0; 
+		for (int i=0; i<m_Np; i++) {
+			val += m_w[i] * f(m_xy[i][0], m_xy[i][1]); 
+		}	
+
+		return val/2; 
+	}
+	/// integrate the lambda function f 
+	inline double integrate(auto& f) {
+		// CH_TIMERS("GQ integrate"); 
 		double val = 0; 
 		for (int i=0; i<m_Np; i++) {
 			val += m_w[i] * f(m_xy[i][0], m_xy[i][1]); 

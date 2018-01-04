@@ -16,7 +16,7 @@ public:
 	GQ1D(int a_p); 
 	/// integrate the lambda function f between 0 and 1 
 	double integrate(auto& f) {
-		CH_TIMERS("GQ1D integrate"); 
+		// CH_TIMERS("GQ1D integrate"); 
 		double val = 0; 
 		for (int i=0; i<m_Np; i++) {
 			val += m_w[i] * f(m_x[i]); 

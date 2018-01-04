@@ -8,6 +8,7 @@ SUPERLU = /opt/superlu
 SUPERLULIB = superlu_5.1
 # compiler 
 CXX = g++
+OPENMP = 1
 
 # directories with source files in them 
 UTILS = $(HOME)/utils
@@ -31,6 +32,9 @@ CFLAGS = -std=c++14 -I$(FE) -I$(OPERATORS) \
 	-I$(EIGEN) -I$(MATERIALS) -I$(FIELD)
 ifdef SUPERLU
 CFLAGS += -DSUPERLU
+endif
+ifdef OPENMP
+CFLAGS += -DOPENMP -fopenmp 
 endif
 
 # optimzation or debug 

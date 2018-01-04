@@ -2,6 +2,7 @@
 #define _ELEMENT_H_
 
 #include <vector>
+#include "Basis.H"
 #include "Node.H"
 #include "Poly2D.H"
 #include "GQ.H"
@@ -26,6 +27,11 @@ public:
 	int getNodeID(int i); 
 	/// get access to node i 
 	Node& getNode(int i); 
+	/// access to node i by indexing into m_nodeList 
+	/** can call any node member function through:\n 
+		<code> Element[i].function() </code> 
+	*/ 
+	Node& operator[](int i); 
 	/// get the centroid of the element 
 	vector<double> getCentroid(); 
 	/// get the number of nodes per element 
@@ -46,6 +52,18 @@ public:
 	double Bi(int i); 
 	/// computes \f$ \hat{n} \oint B_i d\Gamma \f$ on for node a_i
 	vector<double> boundaryIntegral(int a_i); 
+	/// computes \f$\int 2\frac{\partial B_i}{\partial x} \frac{\partial B_j}{\partial x} + \frac{\partial B_i}{\partial y} \frac{\partial B_j}{\partial y} d\Omega \f$ 
+	double NSx(int i, int j); 
+	/// computes \f$\int 2\frac{\partial B_i}{\partial y} \frac{\partial B_j}{\partial y} + \frac{\partial B_i}{\partial x} \frac{\partial B_j}{\partial x} d\Omega \f$
+	double NSy(int i, int j); 
+	/// computes \f$\int \frac{\partial B_i}{\partial y} \frac{\partial B_j}{\partial x} d\Omega \f$ 
+	double dBidy_dBjdx(int i, int j); 
+	/// computes \f$\int \frac{\partial B_i}{\partial x} \frac{\partial B_j}{\partial y} d\Omega \f$ 
+	double dBidx_dBjdy(int i, int j); 
+	/// computes \f$\int \frac{\partial B_i}{\partial x}\hat{B_j} d\Omega \f$
+	double dBidxBhatj(int i, int j); 
+	/// computes \f$\int \frac{\partial B_i}{\partial y}\hat{B_j} d\Omega \f$ 
+	double dBidyBhatj(int i, int j); 
 
 	/// returns true if face a_i is a boundary face 
 	bool boundaryFace(int a_i); 
@@ -53,19 +71,10 @@ public:
 	vector<double> normal(int a_i); 
 
 private:
-	/// computes \f$ \nabla B_i(\xi, \eta) \f$ 
-	vector<double> gradient(int i, double xi, double eta); 
-	/// computes the \f$(i,j)\f$ entry of the Jacobian of the transformation 
-	double J(int i, int j, double xi, double eta); 
-	/// computes the \f$(i,j)\f$ entry of the inverse of the Jacobian 
-	double Jinv(int i, int j, double xi, double eta); 
-	/// computes the determinant of the transformation 
-	double detJ(double xi, double eta); 
-
-	/// stores basis functions
-	vector<Poly2D> m_basis;  
-	/// stores derivative of  basis functions
-	vector<vector<Poly2D>> m_dbasis;  
+	/// quadratic velocity basis functions 
+	Basis m_vbasis; 
+	/// linear pressure basis functions 
+	Basis m_pbasis; 
 	/// vector of nodes
 	vector<Node> m_nodeList;  
 	/// number of nodes per element
@@ -87,6 +96,26 @@ private:
 	vector<vector<double>> m_BiBj; 
 	/// store \f$\int \nabla B_i \cdot \nabla B_j d\Omega \f$ 
 	vector<vector<double>> m_gradBiGradBj; 
+	/// store \f$\int 2\frac{\partial B_i}{\partial x} \frac{\partial B_j}{\partial x} + \frac{\partial B_i}{\partial y} \frac{\partial B_j}{\partial y} d\Omega \f$ 
+	vector<vector<double>> m_NSx; 
+	/// store \f$\int 2\frac{\partial B_i}{\partial y} \frac{\partial B_j}{\partial y} + \frac{\partial B_i}{\partial x} \frac{\partial B_j}{\partial x} d\Omega \f$
+	vector<vector<double>> m_NSy; 
+	/// store \f$\int \frac{\partial B_i}{\partial y} \frac{\partial B_j}{\partial x} d\Omega \f$
+	vector<vector<double>> m_dBidy_dBjdx; 
+	/// stores \f$\int \frac{\partial B_i}{\partial x} \frac{\partial B_j}{\partial y} d\Omega \f$
+	vector<vector<double>> m_dBidx_dBjdy; 
+	/// store \f$\int \frac{\partial B_i}{\partial x}\hat{B_j} d\Omega \f$
+	vector<vector<double>> m_dBidxBhatj; 
+	/// store \f$\int \frac{\partial B_i}{\partial y}\hat{B_j} d\Omega \f$
+	vector<vector<double>> m_dBidyBhatj; 
+
+	// first time booleans 
+	bool m_fNSx; 
+	bool m_fNSy; 
+	bool m_fdBidy_dBjdx; 
+	bool m_fdBidx_dBjdy; 
+	bool m_fdBidxBhatj; 
+	bool m_fdBidyBhatj; 
 
 	/// true if face is a boundary face 
 	vector<bool> m_boundaryFaces; 
