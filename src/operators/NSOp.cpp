@@ -5,6 +5,20 @@
 NSOp::NSOp(FEGrid& a_grid, const Materials& a_materials) 
 	: Operator(a_grid, a_materials) {
 
+	m_stokes = false; 
+}
+
+void NSOp::buildLHS() {
+
+	vector<double> sol(m_grid.getFields().size()); 
+
+	m_stokes = true; 
+
+	buildLHS(sol); 
+}
+
+void NSOp::buildLHS(vector<double>& a_sol) {
+
 	CH_TIMERS("setup LHS"); 
 
 	const int nEl = m_grid.getNumElements(); 
@@ -26,6 +40,11 @@ NSOp::NSOp(FEGrid& a_grid, const Materials& a_materials)
 				for (int k=0; k<el.getNumNodes(); k++) { 
 					if (el[k].isInterior()) {
 						int kid = el[k].interiorNodeID(); 
+						double u0 = a_sol[fields[kid]["u"]]; 
+						double v0 = a_sol[fields[kid]["v"]]; 
+						// nonlinear term 
+						m_matrix(gjid, fields[kid]["u"]) += 
+							rho*(u0*el.BidBjdx(j,k) + v0*el.BidBjdy(j,k)); 
 						// u term 
 						m_matrix(gjid, fields[kid]["u"]) += mu*el.NSx(j,k);  
 						// v term 
@@ -52,7 +71,12 @@ NSOp::NSOp(FEGrid& a_grid, const Materials& a_materials)
 				// u and v terms 
 				for (int k=0; k<el.getNumNodes(); k++) {
 					if (el[k].isInterior()) {
-						int kid = el[k].interiorNodeID();  
+						int kid = el[k].interiorNodeID(); 
+						double u0 = a_sol[fields[kid]["u"]]; 
+						double v0 = a_sol[fields[kid]["v"]]; 
+						// nonlinear term 
+						m_matrix(gjid, fields[kid]["v"]) += 
+							rho*(u0*el.BidBjdx(j,k) + v0*el.BidBjdy(j,k)); 
 						// u term 
 						m_matrix(gjid, fields[kid]["u"]) += mu*el.dBidx_dBjdy(j,k); 
 						// v term 
@@ -114,6 +138,11 @@ void NSOp::makeRHS(vector<double>& a_rhs) {
 				for (int k=0; k<el.getNumNodes(); k++) { 
 					int kid = el[k].interiorNodeID(); 
 					if (kid == -2) {
+						// nonlinear term 
+						if (!m_stokes) {
+							a_rhs[gjid] -= rho*u0*(u0*el.BidBjdx(j,k) + 
+								v0*el.BidBjdy(j,k)); 
+						}
 						// u term 
 						a_rhs[gjid] -= mu*el.NSx(j,k)*u0; 
 						// v term 
@@ -133,6 +162,11 @@ void NSOp::makeRHS(vector<double>& a_rhs) {
 				for (int k=0; k<el.getNumNodes(); k++) {
 					int kid = el[k].interiorNodeID(); 
 					if (kid == -2) {
+						// nonlinear term 
+						if (!m_stokes) {
+							a_rhs[gjid] -= rho*v0*(u0*el.BidBjdx(j,k) + 
+								v0*el.BidBjdy(j,k)); 
+						}
 						// u term 
 						a_rhs[gjid] -= mu*el.dBidx_dBjdy(j,k)*u0; 
 						// v term 

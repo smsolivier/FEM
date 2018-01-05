@@ -1,6 +1,19 @@
 #include "LU.H"
 #include "CH_Timer.H"
 
+LU::LU() {
+
+#ifndef SUPERLU 
+	cout << "ERROR: SuperLU not defined for LU solver" << endl; 
+	exit(0); 
+#else 
+	// setup solver options 
+	set_default_options(&m_options); 
+	m_options.ColPerm = NATURAL; 
+	StatInit(&m_stat); 
+#endif
+}
+
 LU::LU(const SparseMatrix& a_A) {
 
 #ifndef SUPERLU
@@ -32,6 +45,27 @@ LU::LU(const SparseMatrix& a_A) {
 	m_first = true; 
 #endif
 
+}
+
+void LU::operator()(const SparseMatrix& a_A) {
+
+#ifdef SUPERLU
+	if (m_perm_c != NULL) delete(m_perm_c); 
+	if (m_perm_r != NULL) delete(m_perm_r); 
+
+	m_A = a_A; 
+	m_m = m_A.getM(); 
+	m_n = m_A.getN(); 
+
+	m_super = m_A.getSuperMatrix();
+
+	// initialize permutation arrays 
+	m_perm_r = new int[m_m]; 
+	m_perm_c = new int[m_m]; 
+
+	// set to true so factorization will occur 
+	m_first = true; 
+#endif
 }
 
 void LU::solve(vector<double>& a_rhs) {

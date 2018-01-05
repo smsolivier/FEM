@@ -35,7 +35,7 @@ Element::Element(vector<Node>& a_nodeList, int a_group) {
 
 	// set up integrators
 	int p = 1; 
-	if (m_nNodes == 6) p = 6; 
+	if (m_nNodes == 6) p = 4; 
 	else if (m_nNodes == 10) p = 8; 
 	m_gq = GQ(p); 
 	m_gq1d = GQ1D(4); 
@@ -67,6 +67,8 @@ Element::Element(vector<Node>& a_nodeList, int a_group) {
 	m_dBidx_dBjdy.resize(m_nNodes); 
 	m_dBidxBhatj.resize(m_nNodes); 
 	m_dBidyBhatj.resize(m_nNodes);
+	m_BidBjdx.resize(m_nNodes); 
+	m_BidBjdy.resize(m_nNodes); 
 	for (int i=0; i<m_nNodes; i++) {
 		m_NSx[i].resize(m_nNodes); 
 		m_NSy[i].resize(m_nNodes); 
@@ -74,6 +76,8 @@ Element::Element(vector<Node>& a_nodeList, int a_group) {
 		m_dBidx_dBjdy[i].resize(m_nNodes); 
 		m_dBidxBhatj[i].resize(3); 
 		m_dBidyBhatj[i].resize(3);
+		m_BidBjdx[i].resize(m_nNodes); 
+		m_BidBjdy[i].resize(m_nNodes); 
 	}
 
 	// initialize booleans 
@@ -83,6 +87,8 @@ Element::Element(vector<Node>& a_nodeList, int a_group) {
 	m_fdBidx_dBjdy = true; 
 	m_fdBidxBhatj = true; 
 	m_fdBidyBhatj = true; 
+	m_fBidBjdx = true; 
+	m_fBidBjdy = true; 
 }
 
 double Element::gradBiGradBj(int a_i, int a_j) {
@@ -388,6 +394,42 @@ double Element::dBidyBhatj(int a_i, int a_j) {
 	}
 
 	return m_dBidyBhatj[a_i][a_j]; 
+}
+
+double Element::BidBjdx(int a_i, int a_j) {
+
+	if (m_fBidBjdx) {
+
+		for (int i=0; i<m_nNodes; i++) {
+			for (int j=0; j<m_nNodes; j++) {
+				auto f = [this, i, j] (double xi, double eta) {
+					return m_vbasis[i](xi, eta)*m_vbasis.dx(j, xi, eta)*m_vbasis.detJ(xi, eta); 
+				}; 
+				m_BidBjdx[i][j] = m_gq(f); 
+			}
+		}
+		m_fBidBjdx = false; 
+	}
+
+	return m_BidBjdx[a_i][a_j]; 
+}
+
+double Element::BidBjdy(int a_i, int a_j) {
+
+	if (m_fBidBjdy) {
+
+		for (int i=0; i<m_nNodes; i++) {
+			for (int j=0; j<m_nNodes; j++) {
+				auto f = [this, i, j] (double xi, double eta) {
+					return m_vbasis[i](xi, eta)*m_vbasis.dy(j, xi, eta)*m_vbasis.detJ(xi, eta); 
+				}; 
+				m_BidBjdy[i][j] = m_gq(f); 
+			}
+		}
+		m_fBidBjdy = false; 
+	}
+
+	return m_BidBjdy[a_i][a_j]; 
 }
 
 bool Element::boundaryFace(int a_i) {

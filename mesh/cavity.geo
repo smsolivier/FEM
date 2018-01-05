@@ -1,13 +1,13 @@
-L = .5;
-res = .1;
-res2 = .1;
+L = .1;
+res = .001; 
+res2 = .01;
 Point(1) = {0, 0, 0, res};
 //+
 Point(2) = {L, 0, 0, res};
 //+
-Point(3) = {L, L, 0, res/5};
+Point(3) = {L, L, 0, res};
 //+
-Point(4) = {0, L, 0, res/5};
+Point(4) = {0, L, 0, res};
 //+
 Line(1) = {4, 3};
 //+

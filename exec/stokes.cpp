@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
 	mat("mat", "mu") = 1; 
 	mat("mat", "rho") = 1; 
 	NSOp ns(grid, mat); 
+	ns.buildLHS(); 
 
 	SparseMatrix& A = ns.matrix(); 
 	A.sparsity(); 

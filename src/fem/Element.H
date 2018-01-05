@@ -64,6 +64,10 @@ public:
 	double dBidxBhatj(int i, int j); 
 	/// computes \f$\int \frac{\partial B_i}{\partial y}\hat{B_j} d\Omega \f$ 
 	double dBidyBhatj(int i, int j); 
+	/// computes \f$\int B_i \frac{\partial B_j}{\partial x} d\Omega \f$ 
+	double BidBjdx(int i, int j); 
+	/// computes \f$\int B_i \frac{\partial B_j}{\partial y} d\Omega \f$ 
+	double BidBjdy(int i, int j); 
 
 	/// returns true if face a_i is a boundary face 
 	bool boundaryFace(int a_i); 
@@ -108,6 +112,10 @@ private:
 	vector<vector<double>> m_dBidxBhatj; 
 	/// store \f$\int \frac{\partial B_i}{\partial y}\hat{B_j} d\Omega \f$
 	vector<vector<double>> m_dBidyBhatj; 
+	/// store \f$\int B_i \frac{\partial B_j}{\partial x} d\Omega \f$
+	vector<vector<double>> m_BidBjdx; 
+	/// store \f$\int B_i \frac{\partial B_j}{\partial y} d\Omega \f$ 
+	vector<vector<double>> m_BidBjdy; 
 
 	// first time booleans 
 	bool m_fNSx; 
@@ -116,6 +124,8 @@ private:
 	bool m_fdBidx_dBjdy; 
 	bool m_fdBidxBhatj; 
 	bool m_fdBidyBhatj; 
+	bool m_fBidBjdx; 
+	bool m_fBidBjdy; 
 
 	/// true if face is a boundary face 
 	vector<bool> m_boundaryFaces; 

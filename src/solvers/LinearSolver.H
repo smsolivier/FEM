@@ -3,6 +3,7 @@
 
 #include "SparseMatrix.H" 
 #include <vector>
+#include <iostream>
 using namespace std; 
 
 /// base class for all linear system solvers
@@ -17,6 +18,7 @@ public:
 		solution is returned in a_rhs
 	*/ 
 	virtual void solve(vector<double>& a_rhs) = 0; 
+	virtual void operator()(const SparseMatrix& a_A); 
 
 	/// get the sparse matrix, must be provided in constructor of inherited classes 
 	const SparseMatrix& getA() const {return m_A; }; 

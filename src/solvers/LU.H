@@ -13,8 +13,11 @@ using namespace std;
 /// uses SuperLU to solve a linear system. Converts a SparseMatrix to a SuperMatrix 
 class LU : public LinearSolver {
 public:
+	LU(); 
 	/// constructor 
 	LU(const SparseMatrix& a_A); 
+	/// set the matrix to solve
+	void operator()(const SparseMatrix& a_A); 
 
 	/// solve interface 
 	/** 
