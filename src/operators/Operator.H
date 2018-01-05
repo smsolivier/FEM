@@ -2,6 +2,7 @@
 #define _OPERATOR_H_
 
 #include "SparseMatrix.H"
+#include "Materials.H"
 #include "FEGrid.H"
 
 using namespace std; 
@@ -14,7 +15,7 @@ public:
 	/** stores a_grid and initializes the SparseMatrix \n
 		derived classes must construct the LHS in the constructor
 	*/ 
-	Operator(FEGrid& a_grid); 
+	Operator(FEGrid& a_grid, const Materials& a_materials); 
 	/// Generates the right hand side vector 
 	// virtual void makeRHS(vector<double>& a_rhs, 
 		// const vector<double>& a_FCentroids); 
@@ -33,6 +34,8 @@ protected:
 	int m_nInteriorNodes; 
 	/// number of unknowns 
 	int m_nUnknowns; 
+	/// store collection of materials 
+	Materials m_materials; 
 }; 
 
 #endif

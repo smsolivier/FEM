@@ -2,7 +2,8 @@
 #include "CH_Timer.H"
 #include <iostream>
 
-NSOp::NSOp(FEGrid& a_grid) : Operator(a_grid) {
+NSOp::NSOp(FEGrid& a_grid, const Materials& a_materials) 
+	: Operator(a_grid, a_materials) {
 
 	CH_TIMERS("setup LHS"); 
 
@@ -11,6 +12,9 @@ NSOp::NSOp(FEGrid& a_grid) : Operator(a_grid) {
 
 	for (int i=0; i<nEl; i++) {
 		Element& el = m_grid.getElement(i); 
+		int group = el.getGroup(); 
+		double mu = m_materials[group]("mu"); 
+		double rho = m_materials[group]("rho"); 
 
 		// x momentum equation 
 		for (int j=0; j<el.getNumNodes(); j++) {
@@ -23,9 +27,9 @@ NSOp::NSOp(FEGrid& a_grid) : Operator(a_grid) {
 					if (el[k].isInterior()) {
 						int kid = el[k].interiorNodeID(); 
 						// u term 
-						m_matrix(gjid, fields[kid]["u"]) += el.NSx(j,k);  
+						m_matrix(gjid, fields[kid]["u"]) += mu*el.NSx(j,k);  
 						// v term 
-						m_matrix(gjid, fields[kid]["v"]) += el.dBidy_dBjdx(j,k); 
+						m_matrix(gjid, fields[kid]["v"]) += mu*el.dBidy_dBjdx(j,k); 
 					}
 				}
 
@@ -50,9 +54,9 @@ NSOp::NSOp(FEGrid& a_grid) : Operator(a_grid) {
 					if (el[k].isInterior()) {
 						int kid = el[k].interiorNodeID();  
 						// u term 
-						m_matrix(gjid, fields[kid]["u"]) += el.dBidx_dBjdy(j,k); 
+						m_matrix(gjid, fields[kid]["u"]) += mu*el.dBidx_dBjdy(j,k); 
 						// v term 
-						m_matrix(gjid, fields[kid]["v"]) += el.NSy(j,k); 
+						m_matrix(gjid, fields[kid]["v"]) += mu*el.NSy(j,k); 
 					}
 				}
 
@@ -96,6 +100,9 @@ void NSOp::makeRHS(vector<double>& a_rhs) {
 
 	for (int i=0; i<nEl; i++) {
 		Element& el = m_grid.getElement(i); 
+		int group = el.getGroup(); 
+		double mu = m_materials[group]("mu"); 
+		double rho = m_materials[group]("rho"); 
 
 		// x momentum equation 
 		for (int j=0; j<el.getNumNodes(); j++) {
@@ -108,9 +115,9 @@ void NSOp::makeRHS(vector<double>& a_rhs) {
 					int kid = el[k].interiorNodeID(); 
 					if (kid == -2) {
 						// u term 
-						a_rhs[gjid] -= el.NSx(j,k)*u0; 
+						a_rhs[gjid] -= mu*el.NSx(j,k)*u0; 
 						// v term 
-						a_rhs[gjid] -= el.dBidy_dBjdx(j,k)*v0; 
+						a_rhs[gjid] -= mu*el.dBidy_dBjdx(j,k)*v0; 
 					}
 				}
 			} 
@@ -127,9 +134,9 @@ void NSOp::makeRHS(vector<double>& a_rhs) {
 					int kid = el[k].interiorNodeID(); 
 					if (kid == -2) {
 						// u term 
-						a_rhs[gjid] -= el.dBidx_dBjdy(j,k)*u0; 
+						a_rhs[gjid] -= mu*el.dBidx_dBjdy(j,k)*u0; 
 						// v term 
-						a_rhs[gjid] -= el.NSy(j,k)*v0; 
+						a_rhs[gjid] -= mu*el.NSy(j,k)*v0; 
 					}
 				}
 			}
