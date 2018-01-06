@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
 	double Re = 500; 
 	mat("mat", "rho") = 10;
 	mat("mat", "mu") = mat("mat", "rho")*1*.1/Re; 
+	cout << "Re = " << Re << endl; 
 
 	Picard picard; 
 	picard.printStats(); 
@@ -29,7 +30,7 @@ int main(int argc, char* argv[]) {
 	LU lu; 
 
 	vector<double> sol;  
-	double tol = 1e-3; 
+	double tol = 1e-2; 
 	int maxiter = 100; 
 	cout << "starting picard iterations" << endl; 
 	picard.solve(sol, grid, mat, lu, tol, maxiter); 

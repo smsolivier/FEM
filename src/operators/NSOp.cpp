@@ -1,5 +1,6 @@
 #include "NSOp.H"
 #include "CH_Timer.H"
+#include "VectorMath.H"
 #include <iostream>
 
 NSOp::NSOp(FEGrid& a_grid, const Materials& a_materials) 
@@ -139,7 +140,7 @@ void NSOp::makeRHS(vector<double>& a_rhs) {
 					int kid = el[k].interiorNodeID(); 
 					if (kid == -2) {
 						// nonlinear term 
-						if (!m_stokes) {
+						if (m_stokes) {
 							a_rhs[gjid] -= rho*u0*(u0*el.BidBjdx(j,k) + 
 								v0*el.BidBjdy(j,k)); 
 						}
@@ -163,7 +164,7 @@ void NSOp::makeRHS(vector<double>& a_rhs) {
 					int kid = el[k].interiorNodeID(); 
 					if (kid == -2) {
 						// nonlinear term 
-						if (!m_stokes) {
+						if (m_stokes) {
 							a_rhs[gjid] -= rho*v0*(u0*el.BidBjdx(j,k) + 
 								v0*el.BidBjdy(j,k)); 
 						}

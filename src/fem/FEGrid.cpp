@@ -208,6 +208,7 @@ void FEGrid::writeFields(vector<double>& a_sol, const char* a_filename) {
 	vector<double> v = m_fields.extract(a_sol, "v"); 
 	vector<double> p = m_fields.extract(a_sol, "p"); 
 
+	double zero = 1e-6; 
 	// insert zeros 
 	vector<float> u_tmp(m_nTotalNodes), v_tmp(m_nTotalNodes), p_tmp(m_nTotalNodes); 
 	for (int i=0; i<m_nTotalNodes; i++) {
@@ -219,12 +220,12 @@ void FEGrid::writeFields(vector<double>& a_sol, const char* a_filename) {
 
 		else if (m_nodes[i].getInteriorNodeID() == -2) {
 			u_tmp[i] = 1; 
-			v_tmp[i] = 0; 
+			v_tmp[i] = zero; 
 			p_tmp[i] = 0; 
 		}
 		else {
-			u_tmp[i] = 0; 
-			v_tmp[i] = 0; 
+			u_tmp[i] = zero; 
+			v_tmp[i] = zero; 
 			p_tmp[i] = 0; 
 		}
 	}
