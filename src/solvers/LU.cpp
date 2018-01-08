@@ -109,8 +109,12 @@ void LU::solve(vector<double>& a_rhs) {
 	int nrhs = 1; 
 	dCreate_Dense_Matrix(&b, m_m, nrhs, &a_rhs[0], m_m, SLU_DN, SLU_D, SLU_GE); 
 
-	int_t nproc = 4; 
-
+	int_t nproc; 
+	#pragma omp parallel 
+	{
+		nproc = omp_get_num_threads(); 
+	}
+	
 	get_perm_c(0, &m_super, &m_perm_c[0]); 
 	pdgssv(nproc, &m_super, &m_perm_c[0], &m_perm_r[0], &m_L, &m_U, 
 		&b, &m_info); 
