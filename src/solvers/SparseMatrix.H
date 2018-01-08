@@ -4,6 +4,9 @@
 #ifdef SUPERLU
 #include "slu_ddefs.h"
 #endif
+#ifdef PSUPERLU
+#include "slu_mt_ddefs.h"
+#endif
 #include "Sparse"
 #include <vector> 
 #include <string> 
@@ -51,7 +54,7 @@ public:
 	void sparsity() const;
 
 	/// converts 2D to 1D compressed column format and creates a SuperMatrix (SuperLU formatted sparse matrix)
-#ifdef SUPERLU
+#if defined SUPERLU || defined PSUPERLU
 	const SuperMatrix getSuperMatrix() const; 
 #endif
 	/// creates a dense matrix 

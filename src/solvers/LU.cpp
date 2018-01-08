@@ -3,24 +3,22 @@
 
 LU::LU() {
 
-#ifndef SUPERLU 
-	cout << "ERROR: SuperLU not defined for LU solver" << endl; 
-	exit(0); 
-#else 
+#ifdef SUPERLU 
 	// setup solver options 
 	set_default_options(&m_options); 
 	m_options.ColPerm = NATURAL; 
 	StatInit(&m_stat); 
+#elif defined PSUPERLU
+	cout << "define default constructor for parallel LU" << endl; 
+#else 
+	cout << "ERROR: SuperLU not defined for LU solver" << endl; 
+	exit(0); 
 #endif
 }
 
 LU::LU(const SparseMatrix& a_A) {
 
-#ifndef SUPERLU
-	cout << "ERROR: SuperLU not defined for LU solver" << endl; 
-	exit(0); 
-#else
-
+#ifdef SUPERLU 
 	m_A = a_A; 
 
 	m_m = a_A.getM(); 
@@ -38,21 +36,29 @@ LU::LU(const SparseMatrix& a_A) {
 	StatInit(&m_stat); 
 
 	// initialize permutation arrays 
-	m_perm_r = new int[m_m]; 
-	m_perm_c = new int[m_m]; 
+	m_perm_r.resize(m_m);  
+	m_perm_c.resize(m_m);  
 
 	// set to true so factorization will occur 
 	m_first = true; 
-#endif
+#elif defined PSUPERLU 
+	m_A = a_A; 
+	m_n = m_A.getN(); 
+	m_m = m_A.getM(); 
 
+	m_super = m_A.getSuperMatrix();
+
+	m_perm_c.resize(m_m); 
+	m_perm_r.resize(m_m); 
+#else 
+	cout << "ERROR: SuperLU not defined for LU solver" << endl; 
+	exit(0); 
+#endif
 }
 
 void LU::operator()(const SparseMatrix& a_A) {
 
 #ifdef SUPERLU
-	if (m_perm_c != NULL) delete(m_perm_c); 
-	if (m_perm_r != NULL) delete(m_perm_r); 
-
 	m_A = a_A; 
 	m_m = m_A.getM(); 
 	m_n = m_A.getN(); 
@@ -60,8 +66,8 @@ void LU::operator()(const SparseMatrix& a_A) {
 	m_super = m_A.getSuperMatrix();
 
 	// initialize permutation arrays 
-	m_perm_r = new int[m_m]; 
-	m_perm_c = new int[m_m]; 
+	m_perm_r.resize(m_m);  
+	m_perm_c.resize(m_m);  
 
 	// set to true so factorization will occur 
 	m_first = true; 
@@ -81,7 +87,7 @@ void LU::solve(vector<double>& a_rhs) {
 
 		CH_TIMERS("LU factorize and solve"); 
 
-		dgssv(&m_options, &m_super, m_perm_c, m_perm_r, &m_L, &m_U, 
+		dgssv(&m_options, &m_super, &m_perm_c[0], &m_perm_r[0], &m_L, &m_U, 
 			&b, &m_stat, &m_info); 
 
 		m_first = false; // factorization is done now (stored in m_L and m_U)
@@ -93,8 +99,20 @@ void LU::solve(vector<double>& a_rhs) {
 
 		CH_TIMERS("LU solve"); 
 
-		dgstrs(NOTRANS, &m_L, &m_U, m_perm_c, m_perm_r, &b, &m_stat, &m_info); 
+		dgstrs(NOTRANS, &m_L, &m_U, &m_perm_c[0], &m_perm_r[0], &b, &m_stat, &m_info); 
 
 	}
+#elif defined PSUPERLU
+	CH_TIMERS("PLU solve"); 
+
+	SuperMatrix b; 
+	int nrhs = 1; 
+	dCreate_Dense_Matrix(&b, m_m, nrhs, &a_rhs[0], m_m, SLU_DN, SLU_D, SLU_GE); 
+
+	int_t nproc = 4; 
+
+	get_perm_c(0, &m_super, &m_perm_c[0]); 
+	pdgssv(nproc, &m_super, &m_perm_c[0], &m_perm_r[0], &m_L, &m_U, 
+		&b, &m_info); 
 #endif
 }

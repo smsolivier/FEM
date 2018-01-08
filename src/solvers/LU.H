@@ -5,6 +5,9 @@
 #ifdef SUPERLU
 #include "slu_ddefs.h"
 #endif
+#ifdef PSUPERLU
+#include "slu_mt_ddefs.h"
+#endif
 #include <vector> 
 #include "SparseMatrix.H"
 
@@ -29,17 +32,25 @@ private:
 	int m_m; 
 	int m_n; 
 
-	#ifdef SUPERLU
-	SuperMatrix m_super; /// SuperLU formatted matrix 
-	SuperMatrix m_L, m_U; /// store L, U factorization 
-	int * m_perm_r; 
-	int * m_perm_c; 
+	#if defined SUPERLU || defined PSUPERLU
+	/// superlu formatted matrix 
+	SuperMatrix m_super; 
+	/// store L, U factorization for repeated solves 
+	SuperMatrix m_L, m_U; 
+	#endif
+	#ifdef SUPERLU 
 	superlu_options_t m_options; 
 	SuperLUStat_t m_stat; 
-	int m_info; 
 	#endif
+	#ifdef PSUPERLU
+	superlumt_options_t m_options; 
+	#endif
+	vector<int> m_perm_r; 
+	vector<int> m_perm_c; 
+	int m_info; 
 
-	bool m_first; /// if true: do factorization and solve, false: just solve 
+	/// if true: do factorization and solve, false: just solve
+	bool m_first;  
 }; 
 
 #endif 

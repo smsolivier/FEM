@@ -39,10 +39,12 @@ int main(int argc, char* argv[]) {
 	vector<double> sol; 
 	ns.makeRHS(sol); 
 
-	// LU linsol(A); 
-	Cholesky linsol(A); 
+	LU linsol(A); 
+	// Cholesky linsol(A); 
 
+	cout << "solving system" << endl; 
 	linsol.solve(sol); 
 
+	cout << "writing fields to vtk" << endl; 
 	grid.writeFields(sol, "solution.vtk"); 
 }

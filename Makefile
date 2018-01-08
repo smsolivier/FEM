@@ -4,8 +4,10 @@
 # root directory
 HOME = .
 # superlu stuff. where is it installed and what is the library called 
-SUPERLU = /opt/superlu
+# SUPERLU = /opt/superlu
 SUPERLULIB = superlu_5.1
+PSUPERLU = /opt/superlu_mt
+PSUPERLULIB = superlu_mt_OPENMP
 # compiler 
 CXX = g++
 OPENMP = 1
@@ -33,6 +35,9 @@ CFLAGS = -std=c++14 -I$(FE) -I$(OPERATORS) \
 ifdef SUPERLU
 CFLAGS += -DSUPERLU 
 endif
+ifdef PSUPERLU
+CFLAGS += -DPSUPERLU
+endif
 ifdef OPENMP
 CFLAGS += -DOPENMP -fopenmp 
 endif
@@ -50,6 +55,9 @@ ifdef SUPERLU
 LIBS = -I$(SUPERLU)/SRC -L$(SUPERLU)/lib -l$(SUPERLULIB)
 LIBS += -lblas
 endif 
+ifdef PSUPERLU
+LIBS += -I$(PSUPERLU)/SRC -L$(PSUPERLU)/lib -l$(PSUPERLULIB) -lblas_OPENMP
+endif
 
 # get all file names for all .cpp files 
 SRCFILES = $(notdir $(wildcard $(FE)/*.cpp $(OPERATORS)/*.cpp \
