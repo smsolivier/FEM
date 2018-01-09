@@ -47,6 +47,8 @@ OBJ = $(HOME)/obj
 DEP = $(HOME)/dep
 
 # libraries we are dependent on: SuperLU (which depends on BLAS) 
+# only one of SUPERLU and PSUPERLU can be defined (issue with double blas libraries) 
+# blas linking may need to be changed depending on how superlu is installed 
 ifdef SUPERLU
 LIBS = -I$(SUPERLU)/SRC -L$(SUPERLU)/lib -l$(SUPERLULIB)
 LIBS += -lblas
