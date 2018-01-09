@@ -1,9 +1,10 @@
 # make sure there aren't trailing spaces for any directory names! 
 
-# root directory
+# root directory. use override HOME := in makefiles in exec or test directories 
+# using override allows for relative paths 
 HOME = .
 
--include $(HOME)/make.inc
+include $(HOME)/make.inc
 
 # directories with source files in them 
 UTILS = $(HOME)/utils
