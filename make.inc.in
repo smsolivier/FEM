@@ -1,8 +1,11 @@
 # superlu stuff. where is it installed and what is the library called 
 # SUPERLU = /opt/superlu
+# name of library in $(SUPERLU)/lib
 SUPERLULIB = superlu_5.1
+# multi threaded superlu stuff. either SUPERLU or PSUPERLU can be defined not both 
 PSUPERLU = /opt/superlu_mt
 PSUPERLULIB = superlu_mt_OPENMP
 # compiler 
 CXX = g++
+# turn on openmp threading 
 OPENMP = 1
