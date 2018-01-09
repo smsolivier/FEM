@@ -1,16 +1,9 @@
 # make sure there aren't trailing spaces for any directory names! 
 
-# user specific variables 
 # root directory
 HOME = .
-# superlu stuff. where is it installed and what is the library called 
-# SUPERLU = /opt/superlu
-SUPERLULIB = superlu_5.1
-PSUPERLU = /opt/superlu_mt
-PSUPERLULIB = superlu_mt_OPENMP
-# compiler 
-CXX = g++
-OPENMP = 1
+
+-include $(HOME)/make.inc
 
 # directories with source files in them 
 UTILS = $(HOME)/utils
