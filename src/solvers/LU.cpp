@@ -9,7 +9,7 @@ LU::LU() {
 	m_options.ColPerm = NATURAL; 
 	StatInit(&m_stat); 
 #elif defined PSUPERLU
-	cout << "define default constructor for parallel LU" << endl; 
+
 #else 
 	cout << "ERROR: SuperLU not defined for LU solver" << endl; 
 	exit(0); 
@@ -50,6 +50,9 @@ LU::LU(const SparseMatrix& a_A) {
 
 	m_perm_c.resize(m_m); 
 	m_perm_r.resize(m_m); 
+
+	// set to true so factorization will occur 
+	m_first = true; 
 #else 
 	cout << "ERROR: SuperLU not defined for LU solver" << endl; 
 	exit(0); 
@@ -57,8 +60,6 @@ LU::LU(const SparseMatrix& a_A) {
 }
 
 void LU::operator()(const SparseMatrix& a_A) {
-
-#ifdef SUPERLU
 	m_A = a_A; 
 	m_m = m_A.getM(); 
 	m_n = m_A.getN(); 
@@ -67,11 +68,14 @@ void LU::operator()(const SparseMatrix& a_A) {
 
 	// initialize permutation arrays 
 	m_perm_r.resize(m_m);  
-	m_perm_c.resize(m_m);  
+	m_perm_c.resize(m_m);
+	for (int i=0; i<m_m; i++) {
+		m_perm_r[i] = 0; 
+		m_perm_c[i] = 0; 
+	}
 
 	// set to true so factorization will occur 
 	m_first = true; 
-#endif
 }
 
 void LU::solve(vector<double>& a_rhs) {
@@ -103,8 +107,6 @@ void LU::solve(vector<double>& a_rhs) {
 
 	}
 #elif defined PSUPERLU
-	CH_TIMERS("PLU solve"); 
-
 	SuperMatrix b; 
 	int nrhs = 1; 
 	dCreate_Dense_Matrix(&b, m_m, nrhs, &a_rhs[0], m_m, SLU_DN, SLU_D, SLU_GE); 
@@ -114,9 +116,19 @@ void LU::solve(vector<double>& a_rhs) {
 	{
 		nproc = omp_get_num_threads(); 
 	}
-	
-	get_perm_c(0, &m_super, &m_perm_c[0]); 
-	pdgssv(nproc, &m_super, &m_perm_c[0], &m_perm_r[0], &m_L, &m_U, 
-		&b, &m_info); 
+
+	if (m_first) {
+		CH_TIMERS("parallel LU factor and solve"); 
+		get_perm_c(0, &m_super, &m_perm_c[0]); 
+		pdgssv(nproc, &m_super, &m_perm_c[0], &m_perm_r[0], &m_L, &m_U, 
+			&b, &m_info); 
+		m_first = false; 
+	}
+
+	else {
+		CH_TIMERS("LU solve"); 
+		Gstat_t gstat; 
+		dgstrs(NOTRANS, &m_L, &m_U, &m_perm_c[0], &m_perm_r[0], &b, &gstat, &m_info); 
+	}
 #endif
 }

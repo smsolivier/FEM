@@ -95,45 +95,42 @@ double Element::gradBiGradBj(int a_i, int a_j) {
 
 	// CH_TIMERS("gradBiGradBj"); 
 
-	// if (m_nNodes == 3) {
-	// 	if (m_gradBiGradBj.size() == 0) {
-	// 		m_gradBiGradBj.resize(m_nNodes); 
-	// 		for (int i=0; i<m_nNodes; i++) m_gradBiGradBj[i].resize(m_nNodes); 
-	// 		for (int i=0; i<m_nNodes; i++) {
-	// 			for (int j=i; j<m_nNodes; j++) {
-	// 				vector<double> grad_i = gradient(i, 0, 0); 
-	// 				vector<double> grad_j = gradient(j, 0, 0); 
-	// 				// symmetry 
-	// 				double integral = dot(grad_i, grad_j)*detJ(0,0)/2;
-	// 				m_gradBiGradBj[i][j] = integral;
-	// 				m_gradBiGradBj[j][i] = integral;  
-	// 			}
-	// 		}
-	// 	}
-	// 	return m_gradBiGradBj[a_i][a_j]; 
-	// } else {
-	// 	if (m_gradBiGradBj.size() == 0) {
-	// 		m_gradBiGradBj.resize(m_nNodes); 
-	// 		for (int i=0; i<m_nNodes; i++) m_gradBiGradBj[i].resize(m_nNodes); 
-	// 		for (int i=0; i<m_nNodes; i++) {
-	// 			for (int j=i; j<m_nNodes; j++) {
-	// 				auto f = [this, i, j] (double xi, double eta) {
-	// 					vector<double> grad_i = gradient(i, xi, eta); 
-	// 					vector<double> grad_j = gradient(j, xi, eta); 
-	// 					return dot(grad_i, grad_j) * detJ(xi, eta); 
-	// 				}; 
-	// 				// take advantage of symmetry 
-	// 				// grad B_i grad B_j = grad B_j grad B_i 
-	// 				m_gradBiGradBj[i][j] = m_gq.integrate(f);;
-	// 				m_gradBiGradBj[j][i] = m_gradBiGradBj[i][j]; 
-	// 			}
-	// 		}
-	// 	} 
-	// 	return m_gradBiGradBj[a_i][a_j]; 
-	// }
-
-	cout << "gradBiBj not defined" << endl; 
-	exit(0); 
+	if (m_nNodes == 3) {
+		if (m_gradBiGradBj.size() == 0) {
+			m_gradBiGradBj.resize(m_nNodes); 
+			for (int i=0; i<m_nNodes; i++) m_gradBiGradBj[i].resize(m_nNodes); 
+			for (int i=0; i<m_nNodes; i++) {
+				for (int j=i; j<m_nNodes; j++) {
+					vector<double> grad_i = m_vbasis.gradient(i, 0, 0); 
+					vector<double> grad_j = m_vbasis.gradient(j, 0, 0); 
+					// symmetry 
+					double integral = dot(grad_i, grad_j)*m_vbasis.detJ(0,0)/2;
+					m_gradBiGradBj[i][j] = integral;
+					m_gradBiGradBj[j][i] = integral;  
+				}
+			}
+		}
+		return m_gradBiGradBj[a_i][a_j]; 
+	} else {
+		if (m_gradBiGradBj.size() == 0) {
+			m_gradBiGradBj.resize(m_nNodes); 
+			for (int i=0; i<m_nNodes; i++) m_gradBiGradBj[i].resize(m_nNodes); 
+			for (int i=0; i<m_nNodes; i++) {
+				for (int j=i; j<m_nNodes; j++) {
+					auto f = [this, i, j] (double xi, double eta) {
+						vector<double> grad_i = m_vbasis.gradient(i, xi, eta); 
+						vector<double> grad_j = m_vbasis.gradient(j, xi, eta); 
+						return dot(grad_i, grad_j) * m_vbasis.detJ(xi, eta); 
+					}; 
+					// take advantage of symmetry 
+					// grad B_i grad B_j = grad B_j grad B_i 
+					m_gradBiGradBj[i][j] = m_gq.integrate(f);;
+					m_gradBiGradBj[j][i] = m_gradBiGradBj[i][j]; 
+				}
+			}
+		} 
+		return m_gradBiGradBj[a_i][a_j]; 
+	}
 
 }
 
@@ -141,30 +138,27 @@ double Element::BiBj(int a_i, int a_j) {
 
 	// CH_TIMERS("BiBj"); 
 
-	// if (m_nNodes == 3) {
-	// 	return 1./9*detJ(0,0)/2; 
-	// } else {
-	// 	if (m_BiBj.size() == 0) {
-	// 		m_BiBj.resize(m_nNodes); 
-	// 		for (int i=0; i<m_nNodes; i++) m_BiBj[i].resize(m_nNodes); 
-	// 		for (int i=0; i<m_nNodes; i++) {
-	// 			for (int j=i; j<m_nNodes; j++) {
-	// 				auto f = [this, i, j] (double xi, double eta) {
-	// 					return m_basis[i](xi, eta) * 
-	// 						m_basis[j](xi, eta) * detJ(xi, eta); 
-	// 				}; 
-	// 				// symmetry 
-	// 				m_BiBj[i][j] = m_gq.integrate(f); 
-	// 				m_BiBj[j][i] = m_BiBj[i][j]; 
-	// 			}
-	// 		}
-	// 	}
+	if (m_nNodes == 3) {
+		return 1./9*m_vbasis.detJ(0,0)/2; 
+	} else {
+		if (m_BiBj.size() == 0) {
+			m_BiBj.resize(m_nNodes); 
+			for (int i=0; i<m_nNodes; i++) m_BiBj[i].resize(m_nNodes); 
+			for (int i=0; i<m_nNodes; i++) {
+				for (int j=i; j<m_nNodes; j++) {
+					auto f = [this, i, j] (double xi, double eta) {
+						return m_vbasis[i](xi, eta) * 
+							m_vbasis[j](xi, eta) * m_vbasis.detJ(xi, eta); 
+					}; 
+					// symmetry 
+					m_BiBj[i][j] = m_gq.integrate(f); 
+					m_BiBj[j][i] = m_BiBj[i][j]; 
+				}
+			}
+		}
 
-	// 	return m_BiBj[a_i][a_j]; 
-	// }
-
-	cout << "BiBj not defined" << endl; 
-	exit(0); 
+		return m_BiBj[a_i][a_j]; 
+	}
 
 }
 
@@ -172,100 +166,95 @@ double Element::Bi(int a_i) {
 
 	// CH_TIMERS("Bi"); 
 
-	// if (m_nNodes == 3) {
-	// 	return 1./3*detJ(0,0)/2; 
-	// } else {
-	// 	if (m_Bi.size() == 0) {
-	// 		m_Bi.resize(m_nNodes);
-	// 		for (int i=0; i<m_nNodes; i++) {
-	// 			auto f = [this, i] (double xi, double eta) {
-	// 				return m_basis[i](xi, eta) * detJ(xi, eta); 
-	// 			}; 
-	// 			m_Bi[i] = m_gq.integrate(f); 
-	// 		}
-	// 	}
-	// 	return m_Bi[a_i]; 
-	// }
-
-	cout << "Bi not defined" << endl; 
-	exit(0); 
+	if (m_nNodes == 3) {
+		return 1./3*m_vbasis.detJ(0,0)/2; 
+	} else {
+		if (m_Bi.size() == 0) {
+			m_Bi.resize(m_nNodes);
+			for (int i=0; i<m_nNodes; i++) {
+				auto f = [this, i] (double xi, double eta) {
+					return m_vbasis[i](xi, eta) * m_vbasis.detJ(xi, eta); 
+				}; 
+				m_Bi[i] = m_gq.integrate(f); 
+			}
+		}
+		return m_Bi[a_i]; 
+	}
 }
 
 vector<double> Element::boundaryIntegral(int a_i) {
 
 	// CH_TIMERS("boundary integral"); 
 
-	// vector<double> ret(2, 0); 
+	vector<double> ret(2, 0); 
 
-	// int f1 = a_i; 
-	// // if (a_i == 3) f1 = 0; 
-	// // else if (a_i == 4) f1 = 1; 
-	// // else if (a_i == 5) f1 = 2; 
+	int f1 = a_i; 
+	// if (a_i == 3) f1 = 0; 
+	// else if (a_i == 4) f1 = 1; 
+	// else if (a_i == 5) f1 = 2; 
 
-	// if (boundaryFace(f1)) {
+	if (boundaryFace(f1)) {
 
-	// 	double integral = 0; 
-	// 	if (f1 == 0) {
-	// 		auto f = [this, a_i] (double xi) {
-	// 			return m_basis[a_i](xi, 0)*
-	// 				sqrt(pow(J(0,0,xi,0),2)+pow(J(0,1,xi,0),2)); 
-	// 		}; 
-	// 		integral = m_gq1d(f);
-	// 	} else if (f1 == 1) {
-	// 		auto f = [this, a_i] (double xi) {
-	// 			return m_basis[a_i](xi, 1 - xi)*
-	// 				sqrt(pow(J(0,1,xi,1-xi),2) + pow(J(1,0,xi,1-xi),2)); 
-	// 		}; 
-	// 		integral = m_gq1d(f); 
-	// 	} else if (f1 == 2) {
-	// 		auto f = [this, a_i] (double xi) {
-	// 			return m_basis[a_i](0, xi)*
-	// 				sqrt(pow(J(1,0,0,xi),2) + pow(J(1,1,0,xi),2)); 
-	// 		}; 
-	// 		integral = m_gq1d(f); 
-	// 	} else {
-	// 		cout << "a_i not defined" << endl; 
-	// 		exit(0); 
-	// 	}
+		double integral = 0; 
+		if (f1 == 0) {
+			auto f = [this, a_i] (double xi) {
+				return m_vbasis[a_i](xi, 0)*
+					sqrt(pow(m_vbasis.J(0,0,xi,0),2)+pow(m_vbasis.J(0,1,xi,0),2)); 
+			}; 
+			integral = m_gq1d(f);
+		} else if (f1 == 1) {
+			auto f = [this, a_i] (double xi) {
+				return m_vbasis[a_i](xi, 1 - xi)*
+					sqrt(pow(m_vbasis.J(0,1,xi,1-xi),2) + pow(m_vbasis.J(1,0,xi,1-xi),2)); 
+			}; 
+			integral = m_gq1d(f); 
+		} else if (f1 == 2) {
+			auto f = [this, a_i] (double xi) {
+				return m_vbasis[a_i](0, xi)*
+					sqrt(pow(m_vbasis.J(1,0,0,xi),2) + pow(m_vbasis.J(1,1,0,xi),2)); 
+			}; 
+			integral = m_gq1d(f); 
+		} else {
+			cout << "a_i not defined" << endl; 
+			exit(0); 
+		}
 
-	// 	ret += normal(f1)*integral; 
-	// } 
+		ret += normal(f1)*integral; 
+	} 
 
-	// int f2 = f1 - 1; 
-	// if (f2 == -1) f2 = 2; 
-	// if (boundaryFace(f2)) {
+	int f2 = f1 - 1; 
+	if (f2 == -1) f2 = 2; 
+	if (boundaryFace(f2)) {
 
-	// 	double integral = 0; 
-	// 	if (f2 == 0) {
-	// 		auto f = [this, a_i] (double xi) {
-	// 			return m_basis[a_i](xi, 0)*
-	// 				sqrt(pow(J(0,0,xi,0),2)+pow(J(0,1,xi,0),2)); 
-	// 		}; 
-	// 		integral = m_gq1d(f);
-	// 	} else if (f2 == 1) {
-	// 		auto f = [this, a_i] (double xi) {
-	// 			return m_basis[a_i](xi, 1 - xi)*
-	// 				sqrt(pow(J(0,1,xi,1-xi),2) + pow(J(1,0,xi,1-xi),2)); 
-	// 		}; 
-	// 		integral = m_gq1d(f); 
-	// 	} else if (f2 == 2) {
-	// 		auto f = [this, a_i] (double xi) {
-	// 			return m_basis[a_i](0, xi)*
-	// 				sqrt(pow(J(1,0,0,xi),2) + pow(J(1,1,0,xi),2)); 
-	// 		}; 
-	// 		integral = m_gq1d(f); 
-	// 	} else {
-	// 		cout << "a_i not defined" << endl; 
-	// 		exit(0); 
-	// 	}
+		double integral = 0; 
+		if (f2 == 0) {
+			auto f = [this, a_i] (double xi) {
+				return m_vbasis[a_i](xi, 0)*
+					sqrt(pow(m_vbasis.J(0,0,xi,0),2)+pow(m_vbasis.J(0,1,xi,0),2)); 
+			}; 
+			integral = m_gq1d(f);
+		} else if (f2 == 1) {
+			auto f = [this, a_i] (double xi) {
+				return m_vbasis[a_i](xi, 1 - xi)*
+					sqrt(pow(m_vbasis.J(0,1,xi,1-xi),2) + pow(m_vbasis.J(1,0,xi,1-xi),2)); 
+			}; 
+			integral = m_gq1d(f); 
+		} else if (f2 == 2) {
+			auto f = [this, a_i] (double xi) {
+				return m_vbasis[a_i](0, xi)*
+					sqrt(pow(m_vbasis.J(1,0,0,xi),2) + pow(m_vbasis.J(1,1,0,xi),2)); 
+			}; 
+			integral = m_gq1d(f); 
+		} else {
+			cout << "a_i not defined" << endl; 
+			exit(0); 
+		}
 
-	// 	ret += normal(f2)*integral; 
-	// }
+		ret += normal(f2)*integral; 
+	}
 
-	// return ret; 
+	return ret; 
 
-	cout << "boundary integral not defined" << endl; 
-	exit(0); 
 }
 
 double Element::NSx(int a_i, int a_j) {

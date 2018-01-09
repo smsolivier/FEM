@@ -14,19 +14,20 @@
 using namespace std; 
 
 /// uses SuperLU to solve a linear system. Converts a SparseMatrix to a SuperMatrix 
+/** OpenMP parallel SuperLU is used if linked correctly */ 
 class LU : public LinearSolver {
 public:
 	LU(); 
 	/// constructor 
 	LU(const SparseMatrix& a_A); 
-	/// set the matrix to solve
+	/// set the matrix to solve. Used for multiple solves where the LHS changes 
 	void operator()(const SparseMatrix& a_A); 
 
 	/// solve interface 
 	/** 
 		performs a factorization and solve if the first solve. LU factorization is stored for subsequent solves. 
 	*/ 
-	virtual void solve(vector<double>& a_rhs); 
+	void solve(vector<double>& a_rhs); 
 private:
 	// store size of matrix 
 	int m_m; 

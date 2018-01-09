@@ -10,7 +10,7 @@ void Point::addField(string a_name, int a_globalIndex) {
 	}
 }
 
-int Point::operator[](string a_name) {
+int Point::operator[](string a_name) const {
 	int id = -1; 
 	for (int i=0; i<m_names.size(); i++) {
 		if (m_names[i].compare(a_name) == 0) {
@@ -26,7 +26,7 @@ int Point::operator[](string a_name) {
 	return m_ind[id]; 
 }
 
-int Point::operator[](int a_i) {
+int Point::operator[](int a_i) const {
 
 	if (a_i >= m_ind.size()) {
 		cout << "ERROR (Point.cpp): field index out of bounds in operator[]" << endl; 
@@ -36,7 +36,7 @@ int Point::operator[](int a_i) {
 
 }
 
-bool Point::inPoint(string a_name) {
+bool Point::inPoint(string a_name) const {
 
 	for (int i=0; i<m_names.size(); i++) {
 		if (m_names[i].compare(a_name) == 0) return true; 
@@ -46,5 +46,5 @@ bool Point::inPoint(string a_name) {
 
 }
 
-int Point::numFields() {return m_names.size(); }
-string Point::name(int a_i) {return m_names[a_i]; }
+int Point::numFields() const {return m_names.size(); }
+string Point::name(int a_i) const {return m_names[a_i]; }

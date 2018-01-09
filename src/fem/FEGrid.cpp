@@ -80,21 +80,6 @@ FEGrid::FEGrid(const string& a_mshFile) {
 	if (min_group < 0) {
 		cout << "WARNING: material group less than zero" << endl; 
 	}
-
-	// setup field object for P2P1 ordering of unknowns 
-	for (int i=0; i<m_elements.size(); i++) {
-		Element& el = m_elements[i]; 
-		for (int j=0; j<el.getNumNodes(); j++) {
-			if (el[j].isInterior()) {
-				int jid = el[j].interiorNodeID(); 
-				m_fields.set(jid, "u"); 
-				m_fields.set(jid, "v"); 
-				if (j < 3) {
-					m_fields.set(jid, "p"); 
-				}
-			}
-		}
-	}
 }
 
 const Node FEGrid::node(int i) const {return m_nodes[i]; }
@@ -199,14 +184,13 @@ void FEGrid::meshInfo() {
 	cout << "Element Order = " << m_elements[0].getOrder() << endl; 
 }
 
-Fields& FEGrid::getFields() {return m_fields; }
-
-void FEGrid::writeFields(vector<double>& a_sol, const char* a_filename) {
+void FEGrid::writeFields(vector<double>& a_sol, const Fields& a_fields, 
+	const char* a_filename) {
 
 	// extract fields 
-	vector<double> u = m_fields.extract(a_sol, "u"); 
-	vector<double> v = m_fields.extract(a_sol, "v"); 
-	vector<double> p = m_fields.extract(a_sol, "p"); 
+	vector<double> u = a_fields.extract(a_sol, "u"); 
+	vector<double> v = a_fields.extract(a_sol, "v"); 
+	vector<double> p = a_fields.extract(a_sol, "p"); 
 
 	double zero = 1e-6; 
 	// insert zeros 
@@ -320,81 +304,81 @@ void FEGrid::write(vector<double> a_scalarField, const char* a_filename) {
 		vector<Node> nodes = el.nodeList(); 
 		int nNodes = el.getNumNodes(); 
 
-		// if (nNodes == 3) {
+		if (nNodes == 3) {
 			conns.push_back(nodes[0].getNodeID()); 
 			conns.push_back(nodes[1].getNodeID()); 
 			conns.push_back(nodes[2].getNodeID()); 
 			cellType.push_back(VISIT_TRIANGLE); 
-		// }
+		}
 
-		// else if (nNodes == 6) {
-		// 	conns.push_back(nodes[0].getNodeID()); 
-		// 	conns.push_back(nodes[3].getNodeID()); 
-		// 	conns.push_back(nodes[5].getNodeID()); 
-		// 	cellType.push_back(VISIT_TRIANGLE); 
+		else if (nNodes == 6) {
+			conns.push_back(nodes[0].getNodeID()); 
+			conns.push_back(nodes[3].getNodeID()); 
+			conns.push_back(nodes[5].getNodeID()); 
+			cellType.push_back(VISIT_TRIANGLE); 
 
-		// 	conns.push_back(nodes[3].getNodeID()); 
-		// 	conns.push_back(nodes[4].getNodeID()); 
-		// 	conns.push_back(nodes[5].getNodeID()); 
-		// 	cellType.push_back(VISIT_TRIANGLE); 
+			conns.push_back(nodes[3].getNodeID()); 
+			conns.push_back(nodes[4].getNodeID()); 
+			conns.push_back(nodes[5].getNodeID()); 
+			cellType.push_back(VISIT_TRIANGLE); 
 
-		// 	conns.push_back(nodes[3].getNodeID()); 
-		// 	conns.push_back(nodes[1].getNodeID()); 
-		// 	conns.push_back(nodes[4].getNodeID()); 
-		// 	cellType.push_back(VISIT_TRIANGLE); 
+			conns.push_back(nodes[3].getNodeID()); 
+			conns.push_back(nodes[1].getNodeID()); 
+			conns.push_back(nodes[4].getNodeID()); 
+			cellType.push_back(VISIT_TRIANGLE); 
 
-		// 	conns.push_back(nodes[5].getNodeID()); 
-		// 	conns.push_back(nodes[4].getNodeID()); 
-		// 	conns.push_back(nodes[2].getNodeID()); 
-		// 	cellType.push_back(VISIT_TRIANGLE); 
-		// }
+			conns.push_back(nodes[5].getNodeID()); 
+			conns.push_back(nodes[4].getNodeID()); 
+			conns.push_back(nodes[2].getNodeID()); 
+			cellType.push_back(VISIT_TRIANGLE); 
+		}
 
-		// else if (nNodes == 10) {
-		// 	conns.push_back(nodes[0].getNodeID()); 
-		// 	conns.push_back(nodes[3].getNodeID()); 
-		// 	conns.push_back(nodes[8].getNodeID()); 
-		// 	cellType.push_back(VISIT_TRIANGLE); 
+		else if (nNodes == 10) {
+			conns.push_back(nodes[0].getNodeID()); 
+			conns.push_back(nodes[3].getNodeID()); 
+			conns.push_back(nodes[8].getNodeID()); 
+			cellType.push_back(VISIT_TRIANGLE); 
 
-		// 	conns.push_back(nodes[3].getNodeID()); 
-		// 	conns.push_back(nodes[4].getNodeID()); 
-		// 	conns.push_back(nodes[9].getNodeID()); 
-		// 	cellType.push_back(VISIT_TRIANGLE); 
+			conns.push_back(nodes[3].getNodeID()); 
+			conns.push_back(nodes[4].getNodeID()); 
+			conns.push_back(nodes[9].getNodeID()); 
+			cellType.push_back(VISIT_TRIANGLE); 
 
-		// 	conns.push_back(nodes[4].getNodeID()); 
-		// 	conns.push_back(nodes[1].getNodeID()); 
-		// 	conns.push_back(nodes[5].getNodeID()); 
-		// 	cellType.push_back(VISIT_TRIANGLE); 
+			conns.push_back(nodes[4].getNodeID()); 
+			conns.push_back(nodes[1].getNodeID()); 
+			conns.push_back(nodes[5].getNodeID()); 
+			cellType.push_back(VISIT_TRIANGLE); 
 			
-		// 	conns.push_back(nodes[5].getNodeID()); 
-		// 	conns.push_back(nodes[9].getNodeID()); 
-		// 	conns.push_back(nodes[4].getNodeID()); 
-		// 	cellType.push_back(VISIT_TRIANGLE); 
+			conns.push_back(nodes[5].getNodeID()); 
+			conns.push_back(nodes[9].getNodeID()); 
+			conns.push_back(nodes[4].getNodeID()); 
+			cellType.push_back(VISIT_TRIANGLE); 
 
-		// 	conns.push_back(nodes[9].getNodeID()); 
-		// 	conns.push_back(nodes[8].getNodeID()); 
-		// 	conns.push_back(nodes[3].getNodeID()); 
-		// 	cellType.push_back(VISIT_TRIANGLE); 
+			conns.push_back(nodes[9].getNodeID()); 
+			conns.push_back(nodes[8].getNodeID()); 
+			conns.push_back(nodes[3].getNodeID()); 
+			cellType.push_back(VISIT_TRIANGLE); 
 
-		// 	conns.push_back(nodes[9].getNodeID()); 
-		// 	conns.push_back(nodes[5].getNodeID()); 
-		// 	conns.push_back(nodes[6].getNodeID()); 
-		// 	cellType.push_back(VISIT_TRIANGLE); 
+			conns.push_back(nodes[9].getNodeID()); 
+			conns.push_back(nodes[5].getNodeID()); 
+			conns.push_back(nodes[6].getNodeID()); 
+			cellType.push_back(VISIT_TRIANGLE); 
 
-		// 	conns.push_back(nodes[8].getNodeID()); 
-		// 	conns.push_back(nodes[9].getNodeID()); 
-		// 	conns.push_back(nodes[7].getNodeID()); 
-		// 	cellType.push_back(VISIT_TRIANGLE); 
+			conns.push_back(nodes[8].getNodeID()); 
+			conns.push_back(nodes[9].getNodeID()); 
+			conns.push_back(nodes[7].getNodeID()); 
+			cellType.push_back(VISIT_TRIANGLE); 
 
-		// 	conns.push_back(nodes[9].getNodeID()); 
-		// 	conns.push_back(nodes[6].getNodeID()); 
-		// 	conns.push_back(nodes[7].getNodeID()); 
-		// 	cellType.push_back(VISIT_TRIANGLE); 
+			conns.push_back(nodes[9].getNodeID()); 
+			conns.push_back(nodes[6].getNodeID()); 
+			conns.push_back(nodes[7].getNodeID()); 
+			cellType.push_back(VISIT_TRIANGLE); 
 
-		// 	conns.push_back(nodes[7].getNodeID()); 
-		// 	conns.push_back(nodes[6].getNodeID()); 
-		// 	conns.push_back(nodes[2].getNodeID()); 
-		// 	cellType.push_back(VISIT_TRIANGLE); 
-		// }
+			conns.push_back(nodes[7].getNodeID()); 
+			conns.push_back(nodes[6].getNodeID()); 
+			conns.push_back(nodes[2].getNodeID()); 
+			cellType.push_back(VISIT_TRIANGLE); 
+		}
 	}
 
 	write_unstructured_mesh(a_filename, 0, nNodes, &(pts[0]), cellType.size(), 

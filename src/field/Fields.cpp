@@ -31,13 +31,17 @@ int Fields::operator()(int a_pointNum, string a_name) {
 	return m_points[a_pointNum][a_name]; 
 }
 
-Point& Fields::operator[](int a_pointNum) {
+const Point& Fields::operator[](int a_pointNum) const {
+	if (a_pointNum > m_points.size()) {
+		cout << "ERROR (Fields.cpp): index out of m_points" << endl; 
+		exit(0); 
+	}
 	return m_points[a_pointNum]; 
 }
 
-int Fields::size() {return m_nUnknowns; }
+int Fields::size() const {return m_nUnknowns; }
 
-vector<double> Fields::extract(vector<double>& a_vals, string a_name) {
+vector<double> Fields::extract(vector<double>& a_vals, string a_name) const {
 	assert(a_vals.size() == m_nUnknowns); 
 
 	int nPoints = m_points.size(); 
@@ -51,10 +55,10 @@ vector<double> Fields::extract(vector<double>& a_vals, string a_name) {
 	return ret; 
 }
 
-void Fields::printUnknownOrdering() {
+void Fields::printUnknownOrdering() const {
 	vector<string> ret(m_nUnknowns); 
 	for (int i=0; i<m_points.size(); i++) {
-		Point& p = m_points[i]; 
+		Point p = m_points[i]; 
 		for (int j=0; j<m_points[i].numFields(); j++) {
 			ret[p[j]] = p.name(j); 
 		}
@@ -65,7 +69,7 @@ void Fields::printUnknownOrdering() {
 	}
 }
 
-void Fields::printFieldsPerPoint() {
+void Fields::printFieldsPerPoint() const {
 	for (int i=0; i<m_points.size(); i++) {
 		cout << i << ": "; 
 		for (int j=0; j<m_points[i].numFields(); j++) {

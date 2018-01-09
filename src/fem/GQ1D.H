@@ -6,7 +6,8 @@
 
 using namespace std; 
 
-/// Gauss Quadrature between 0 and 1 
+/// Performs Gauss Quadrature integration in 1D   
+/** integrates between 0 and 1 not -1 and 1 */ 
 class GQ1D {
 public:
 	/// default constructor 
@@ -26,7 +27,6 @@ public:
 	}
 
 	double operator()(auto& f) {return integrate(f); } 
-
 private:
 	/// quadrature weights 
 	vector<double> m_w; 

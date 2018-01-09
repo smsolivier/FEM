@@ -19,10 +19,26 @@ int main(int argc, char* argv[]) {
 	grid.meshInfo(); 
 	grid.precomputeIntegrals(); 
 
+	// setup field object for P2P1 ordering of unknowns 
+	Fields fields; 
+	for (int i=0; i<grid.getNumElements(); i++) {
+		Element& el = grid.getElement(i); 
+		for (int j=0; j<el.getNumNodes(); j++) {
+			if (el[j].isInterior()) {
+				int jid = el[j].interiorNodeID(); 
+				fields.set(jid, "u"); 
+				fields.set(jid, "v"); 
+				if (j < 3) {
+					fields.set(jid, "p"); 
+				}
+			}
+		}
+	}
+
 	Materials mat; 
 	mat("mat", "mu") = 1; 
 	mat("mat", "rho") = 1; 
-	NSOp ns(grid, mat); 
+	NSOp ns(grid, mat, fields); 
 	ns.buildLHS(); 
 
 	SparseMatrix& A = ns.matrix(); 
@@ -46,5 +62,5 @@ int main(int argc, char* argv[]) {
 	linsol.solve(sol); 
 
 	cout << "writing fields to vtk" << endl; 
-	grid.writeFields(sol, "solution.vtk"); 
+	grid.writeFields(sol, fields, "solution.vtk"); 
 }

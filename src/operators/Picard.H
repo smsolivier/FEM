@@ -15,7 +15,7 @@ public:
 	Picard() {}; 
 	/// solve 
 	void solve(vector<double>& a_sol, FEGrid& a_grid, const Materials& a_materials, 
-		LinearSolver& a_solver, double a_tol, int a_maxiter); 
+		const Fields& a_fields, LinearSolver& a_solver, double a_tol, int a_maxiter); 
 
 	/// output iteration information 
 	void printStats(); 

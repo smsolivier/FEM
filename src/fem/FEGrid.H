@@ -35,7 +35,8 @@ public:
 	void precomputeIntegrals(); 
 
 	/// write all fields to one vtk file 
-	void writeFields(vector<double>& a_sol, const char* a_filename); 
+	void writeFields(vector<double>& a_sol, const Fields& a_fields, 
+		const char* a_filename); 
 	/// write a .vtk file 
 	void write(vector<double> a_scalarField, const char* a_filename); 
 
@@ -44,9 +45,6 @@ public:
 
 	/// print number of elements and unknowns and the average element area 
 	void meshInfo(); 
-
-	/// return field object 
-	Fields& getFields(); 
 private:
 	/// stores the nodes 
 	vector<Node> m_nodes;
@@ -56,8 +54,6 @@ private:
 	int m_nInteriorNodes; 
 	/// stores the total number of nodes 
 	int m_nTotalNodes; 
-	/// store unknown ordering 
-	Fields m_fields; 
 }; 
 
 #endif 

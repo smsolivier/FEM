@@ -4,6 +4,7 @@
 #include "SparseMatrix.H"
 #include "Materials.H"
 #include "FEGrid.H"
+#include "Fields.H"
 
 using namespace std; 
 
@@ -15,15 +16,16 @@ public:
 	/** stores a_grid and initializes the SparseMatrix \n
 		derived classes must construct the LHS in the constructor
 	*/ 
+	Operator(FEGrid& a_grid, const Materials& a_materials, const Fields& a_fields); 
+	/// base constructor for programs that don't require the fields class 
 	Operator(FEGrid& a_grid, const Materials& a_materials); 
-	/// Generates the right hand side vector 
-	// virtual void makeRHS(vector<double>& a_rhs, 
-		// const vector<double>& a_FCentroids); 
 
 	/// get the left hand side matrix 
 	SparseMatrix& matrix(); 
 	/// returns the FEGrid object 
 	FEGrid& getFEGrid(); 
+	/// return the Materials object 
+	Materials& getMaterials(); 
 	
 protected:
 	/// stores the LHS matrix
@@ -36,6 +38,8 @@ protected:
 	int m_nUnknowns; 
 	/// store collection of materials 
 	Materials m_materials; 
+	/// store the fields object 
+	Fields m_fields; 
 }; 
 
 #endif
