@@ -4,6 +4,8 @@
 # using override allows for relative paths 
 HOME = .
 
+# include user specific information
+# defines compiler type, SuperLU info, and whether to use openmp 
 include $(HOME)/make.inc
 
 # directories with source files in them 
