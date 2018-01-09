@@ -1,2 +1,4 @@
 ## Wave Equation 
-<video src="movie.mp4" width="320" height="200" controls preload></video>
+<video width="480" height="320" controls="controls">
+  <source src="movie.mp4" type="video/mp4">
+</video>
