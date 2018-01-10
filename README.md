@@ -1,5 +1,5 @@
 # FEM
-Generalized, arbitrary order continuous finite element code on triangles
+An continuous Finite Element Method package for solving problems on first, second, and third order triangles. Example uses can be found at http://samolivier.net/category/fem/. 
 
 # Building
 The only dependency is [SuperLU](http://crd-legacy.lbl.gov/~xiaoye/SuperLU/) (either the serial or multi threaded openMP versions will work). This can be avoided by not using the LU solver and instead using Eigen's Cholesky solver. Currently, there isn't an alternative for directly solving unsymmetric matrices (such as for Navier Stokes). 
