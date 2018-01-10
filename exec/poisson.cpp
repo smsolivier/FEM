@@ -38,7 +38,10 @@ int main(int argc, char* argv[]) {
 
 	Materials mat; 
 	mat("core", "k") = 1; 
-	mat("reflector", "k") = 10; 
+	mat("reflector", "k") = 1; 
+	mat("test", "k") = 1; 
+	mat("test2", "k") = 1; 
+	mat("test3", "k") = 1; 
 	PoissonOperator op(grid, mat); 
 
 	SparseMatrix A = op.matrix(); 
@@ -59,12 +62,22 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+	vector<double> FCentroids(nEl, 0); 
+	for (int i=0; i<nEl; i++) {
+		Element& el = grid.getElement(i); 
+		int group = el.getGroup(); 
+		if (group > 0) {
+			FCentroids[i] = 1; 
+		}
+	}
+
 	vector<double> b; 
 
 	CG * cg = new CG(A, 1e-6, 1000); 
 	cg->printStats(); 
 	cg->plot(); 
 	op.makeRHS(b, FNodes); 
+	// op.makeRHSAtCentroids(b, FCentroids); 
 	cg->solve(b); 
 	delete(cg); 
 

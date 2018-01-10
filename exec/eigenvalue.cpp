@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
 
 	mat("reflector", "Sigma_t") = 6; 
 	mat("reflector", "Sigma_a") = .1; 
-	mat("reflector", "nuSigma_f") = 0; 
+	mat("reflector", "nuSigma_f") = 0;
 
 	DiffusionOperator op(grid, mat);
 

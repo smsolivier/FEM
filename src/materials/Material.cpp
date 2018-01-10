@@ -13,7 +13,7 @@ double& Material::operator()(string a_var) {
 	// search for a_var in m_vars 
 	int id = -1; 
 	for (int i=0; i<m_vars.size(); i++) {
-		if (m_vars[i].compare(a_var) == 0) id = i; 
+		if (a_var.compare(m_vars[i]) == 0) id = i; 
 	}
 
 	if (id == -1) {
@@ -30,7 +30,7 @@ double Material::operator()(string a_var) const {
 	// search for a_var in m_vars 
 	int id = -1; 
 	for (int i=0; i<m_vars.size(); i++) {
-		if (m_vars[i].compare(a_var) == 0) id = i; 
+		if (a_var.compare(m_vars[i]) == 0) id = i; 
 	}
 
 	if (id == -1) {

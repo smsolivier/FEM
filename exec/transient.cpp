@@ -31,7 +31,21 @@ int main(int argc, char* argv[]) {
 
 	Materials mat; 
 	mat("mat", "k") = 1; 
-	mat("mat", "alpha") = 1/mat("mat", "k"); 
+	mat("mat", "alpha") = 1/mat("mat", "k");
+
+	mat("mat1", "k") = 1; 
+	mat("mat1", "alpha") = 1/mat("mat", "k");
+
+	mat("mat2", "k") = 1; 
+	mat("mat2", "alpha") = 1/mat("mat", "k");
+
+	mat("mat3", "k") = 1; 
+	mat("mat3", "alpha") = 1/mat("mat", "k");
+
+	mat("mat4", "k") = 1; 
+	mat("mat4", "alpha") = 1/mat("mat", "k");
+
+
 
 	vector<double> F(nIntNodes); 
 	vector<double> T_old(nIntNodes, 0); 

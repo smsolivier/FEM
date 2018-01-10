@@ -58,6 +58,11 @@ double Materials::operator()(string a_name, string a_var) const {
 
 const Material& Materials::operator[](int a_id) const {
 
+	if (a_id >= m_materials.size()) {
+		cout << "ERROR (Materials.cpp): index out of bounds in operator[]" << endl; 
+		exit(0); 
+	}
+
 	return m_materials[a_id]; 
 
 }
