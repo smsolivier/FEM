@@ -55,7 +55,7 @@ public:
 
 	/// converts 2D to 1D compressed column format and creates a SuperMatrix (SuperLU formatted sparse matrix)
 #if defined SUPERLU || defined PSUPERLU
-	const SuperMatrix getSuperMatrix() const; 
+	SuperMatrix getSuperMatrix() const; 
 #endif
 	/// creates a dense matrix 
 	const vector<vector<double>> getDenseMatrix() const; 

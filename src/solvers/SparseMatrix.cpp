@@ -126,7 +126,7 @@ double SparseMatrix::at(int a_row, int a_col) const {
 }
 
 #if defined SUPERLU || defined PSUPERLU
-const SuperMatrix SparseMatrix::getSuperMatrix() const {
+SuperMatrix SparseMatrix::getSuperMatrix() const {
 
 	CH_TIMERS("SPMAT: convert to SuperMatrix"); 
 
