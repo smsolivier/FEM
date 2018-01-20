@@ -3,6 +3,9 @@
 
 LU::LU() {
 
+	m_first = true; 
+	m_repeated = false; 
+
 #ifdef SUPERLU 
 	// setup solver options 
 	set_default_options(&m_options); 
@@ -66,15 +69,18 @@ void LU::operator()(const SparseMatrix& a_A) {
 
 	m_super = m_A.getSuperMatrix();
 
-	// initialize permutation arrays 
-	m_perm_r.resize(m_m);  
-	m_perm_c.resize(m_m);
-	for (int i=0; i<m_m; i++) {
-		m_perm_r[i] = 0; 
-		m_perm_c[i] = 0; 
+	if (!m_repeated) {
+		// initialize permutation arrays 
+		m_perm_r.resize(m_m);  
+		m_perm_c.resize(m_m);
+		for (int i=0; i<m_m; i++) {
+			m_perm_r[i] = 0; 
+			m_perm_c[i] = 0; 
+		}
+		get_perm_c(0, &m_super, &m_perm_c[0]); 
+		m_repeated = true; 
 	}
 
-	// set to true so factorization will occur 
 	m_first = true; 
 }
 
@@ -107,9 +113,8 @@ void LU::solve(vector<double>& a_rhs) {
 
 	}
 #elif defined PSUPERLU
-	SuperMatrix b; 
 	int nrhs = 1; 
-	dCreate_Dense_Matrix(&b, m_m, nrhs, &a_rhs[0], m_m, SLU_DN, SLU_D, SLU_GE); 
+	dCreate_Dense_Matrix(&m_b, m_m, nrhs, &a_rhs[0], m_m, SLU_DN, SLU_D, SLU_GE); 
 
 	int_t nproc; 
 	#pragma omp parallel 
@@ -119,16 +124,21 @@ void LU::solve(vector<double>& a_rhs) {
 
 	if (m_first) {
 		CH_TIMERS("parallel LU factor and solve"); 
-		get_perm_c(0, &m_super, &m_perm_c[0]); 
+		// get_perm_c(0, &m_super, &m_perm_c[0]); 
 		pdgssv(nproc, &m_super, &m_perm_c[0], &m_perm_r[0], &m_L, &m_U, 
-			&b, &m_info); 
+			&m_b, &m_info); 
 		m_first = false; 
 	}
 
 	else {
 		CH_TIMERS("LU solve"); 
 		Gstat_t gstat; 
-		dgstrs(NOTRANS, &m_L, &m_U, &m_perm_c[0], &m_perm_r[0], &b, &gstat, &m_info); 
+		dgstrs(NOTRANS, &m_L, &m_U, &m_perm_c[0], &m_perm_r[0], &m_b, &gstat, &m_info); 
 	}
+
+	Destroy_CompCol_Matrix(&m_super); 
+	Destroy_CompCol_Matrix(&m_U); 
+	Destroy_CompCol_Matrix(&m_L); 
+
 #endif
 }

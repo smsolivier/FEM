@@ -36,6 +36,8 @@ private:
 	#if defined SUPERLU || defined PSUPERLU
 	/// superlu formatted matrix 
 	SuperMatrix m_super; 
+	/// superlu right hand side 
+	SuperMatrix m_b; 
 	/// store L, U factorization for repeated solves 
 	SuperMatrix m_L, m_U; 
 	#endif
@@ -52,6 +54,8 @@ private:
 
 	/// if true: do factorization and solve, false: just solve
 	bool m_first;  
+	/// 
+	bool m_repeated; 
 }; 
 
 #endif 
