@@ -1,7 +1,6 @@
 #include "SparseMatrix.H"
 #include "CG.H"
 #include "LU.H"
-#include "PLU.H"
 #include "Jacobi.H"
 #include "Dense.H"
 #include "GMRES.H"
@@ -56,9 +55,7 @@ int main() {
 	// create solver objects 
 	// CG cg(A, 1e-8, 10000); 
 	// Jacobi jacobi(A, 1e-8, 100000); 
-	// LU lu(A); 
-	// LU lu(A); 
-	PLU plu(A); 
+	LU lu(A); 
 	// Dense dense(A); 
 	// GMRES gmres(A, 1e-8, N/5, 100); 
 	// gmres.setVerbose(); 
@@ -67,8 +64,7 @@ int main() {
 	// make sure solution is ones 
 	// cout << "CG " << testPass(cg, b) << endl; 
 	// cout << "Jacobi " << testPass(jacobi, b) << endl; 
-	// cout << "LU " << testPass(lu, b) << endl; 
-	cout << "PLU" << testPass(plu, b) << endl; 
+	cout << "LU " << testPass(lu, b) << endl; 
 	// cout << "Dense " << testPass(dense, b) << endl; 
 	// cout << "GMRES " << testPass(gmres, b) << endl; 
 

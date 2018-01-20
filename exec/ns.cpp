@@ -35,9 +35,11 @@ int main(int argc, char* argv[]) {
 	}
 
 	Materials mat; 
-	double Re = 100; 
+	double Re = 500; 
+	double L = .01; 
 	mat("mat", "rho") = 10;
-	mat("mat", "mu") = mat("mat", "rho")*1*.1/Re; 
+	mat("mat", "mu") = mat("mat", "rho")*1*L/Re; 
+	cout << "nu = " << mat("mat", "mu")/mat("mat", "rho") << endl; 
 	cout << "Re = " << Re << endl; 
 
 	Picard picard; 
@@ -46,8 +48,8 @@ int main(int argc, char* argv[]) {
 	LU lu; 
 
 	vector<double> sol;  
-	double tol = 1e-2; 
-	int maxiter = 100; 
+	double tol = 1e-3; 
+	int maxiter = 30; 
 	cout << "starting picard iterations" << endl; 
 	picard.solve(sol, grid, mat, fields, lu, tol, maxiter); 
 

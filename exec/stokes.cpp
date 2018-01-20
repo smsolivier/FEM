@@ -36,8 +36,13 @@ int main(int argc, char* argv[]) {
 	}
 
 	Materials mat; 
-	mat("mat", "mu") = 1; 
-	mat("mat", "rho") = 1; 
+	double Re = 500; 
+	double L = .01; 
+	mat("mat", "rho") = 10;
+	mat("mat", "mu") = mat("mat", "rho")*1*L/Re; 
+	cout << "nu = " << mat("mat", "mu")/mat("mat", "rho") << endl; 
+	cout << "Re = " << Re << endl;
+	
 	NSOp ns(grid, mat, fields); 
 	ns.buildLHS(); 
 
@@ -55,8 +60,8 @@ int main(int argc, char* argv[]) {
 	vector<double> sol; 
 	ns.makeRHS(sol); 
 
-	LU linsol(A); 
-	// Cholesky linsol(A); 
+	// LU linsol(A); 
+	Cholesky linsol(A); 
 
 	cout << "solving system" << endl; 
 	linsol.solve(sol); 

@@ -43,7 +43,7 @@ void Picard::solve(vector<double>& a_sol, FEGrid& a_grid,
 	}
 
 	if (i == a_maxiter) {
-		cout << "WARNING: maximum number of iterations reached in Piacard solver" << endl; 
+		cout << "WARNING: maximum number of iterations reached in Picard solver" << endl; 
 	}
 
 	if (m_print) {
